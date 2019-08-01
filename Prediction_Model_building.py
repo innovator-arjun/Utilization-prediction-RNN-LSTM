@@ -9,7 +9,7 @@ import numpy as np
 
 # In[26]:
 
-preprocessed_df=pd.read_csv('/home/rootuser/arj/ticket/Data/preprocessed_data.csv')
+preprocessed_df=pd.read_csv('C:/Users/ar393556/Documents/Utilization-prediction-RNN-LSTM/Data/preprocessed_data.csv')
 preprocessed_df.drop(['Unnamed: 0'],1,inplace=True)
 
 
@@ -113,64 +113,13 @@ regressor.summary()
 # In[38]:
 
 # Fitting the RNN to the Training set
-regressor.fit(X_train, y_train, epochs = 200, batch_size = 32)
+regressor.fit(X_train, y_train, epochs =10, batch_size = 32)
 
 
 # In[98]:
 
 print('model built successfully')
-regressor.save('/home/rootuser/arj/ticket/model/dns-sgd(200 epo- 80 neuron-200 time).h5') 
-
-
-# In[99]:
-
-
-real_pattern_prediction=df[len(df)-3000:]
-
-
-# In[100]:
-
-real_pattern_prediction.head()
-
-
-# In[101]:
-
-training_set.head()
-
-
-# In[102]:
-
-
-# Getting the Random predictiond data
-dataset_total = pd.concat((training_set['Utilization(bps)'], real_pattern_prediction['Utilization(bps)']), axis = 0)
-inputs = dataset_total[len(dataset_total) - len(real_pattern_prediction) - 150:].values
-inputs = inputs.reshape(-1,1)
-inputs = sc.transform(inputs)
-X_test = []
-for i in range(150, len(real_pattern_prediction)+150):
-    X_test.append(inputs[i-150:i, 0])
-X_test = np.array(X_test)
-X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-predicted_pattern = regressor.predict(X_test)
-predicted_pattern = sc.inverse_transform(predicted_pattern)
-
-
-# In[103]:
-
-import matplotlib.pyplot as plt
-get_ipython().magic('matplotlib inline')
-real_pattern_prediction=real_pattern_prediction.iloc[:, 1:2].values
-# Visualising the results
-plt.plot(real_pattern_prediction, color = 'red', label = 'Real Pattern Number')
-plt.plot(predicted_pattern, color = 'blue', label = 'Predicted Pattern Number')
-plt.title('Pattern Number Prediction')
-plt.xlabel('record')
-plt.ylabel('Pattern Number')
-plt.legend()
-plt.show()
-
-
-# In[ ]:
+regressor.save('C:/Users/ar393556/Documents/Utilization-prediction-RNN-LSTM/model/task-scheduler.h5') 
 
 
 
