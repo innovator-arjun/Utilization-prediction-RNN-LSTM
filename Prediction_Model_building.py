@@ -44,7 +44,7 @@ df.shape
 
 # In[32]:
 
-training_set=df[0:len(df)-3000]
+training_set=df[0:len(df)-150]
 print(training_set.shape)
 training_set_sliced = training_set.iloc[:, 1:2].values
 
@@ -62,8 +62,8 @@ training_set_scaled = sc.fit_transform(training_set_sliced)
 # Creating a data structure with 100 timesteps and 1 output
 X_train = []
 y_train = []
-for i in range(150, len(training_set)):
-    X_train.append(training_set_scaled[i-150:i, 0])
+for i in range(15, len(training_set)):
+    X_train.append(training_set_scaled[i-15:i, 0])
     y_train.append(training_set_scaled[i, 0])
 X_train, y_train = np.array(X_train), np.array(y_train)
 
@@ -88,18 +88,18 @@ regressor = Sequential()
 
 
 # Adding the first LSTM layer and some Dropout regularisation
-regressor.add(LSTM(units = 80, return_sequences = True, input_shape = (X_train.shape[1], 1)))
+# Adding the first LSTM layer and some Dropout regularisation
+regressor.add(LSTM(units = 100, activation = 'relu',return_sequences=True,input_shape = (X_train.shape[1], 1)))
 
-
-# Adding a second LSTM layer and some Dropout regularisation
-regressor.add(LSTM(units = 80))
-regressor.add(Dropout(0.2))
-
+regressor.add(Dropout(0.1))
+regressor.add(LSTM(units = 50, activation = 'relu'))
 # Adding the output layer
 regressor.add(Dense(units = 1))
-
+#regressor.add(Activation("linear"))
 # Compiling the RNN
-regressor.compile(optimizer = 'sgd', loss = 'mean_squared_error')
+#regressor.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics=['accuracy'])
+regressor.compile(loss="mse", optimizer="adam",metrics=['accuracy'])
+
 
 
 
@@ -113,7 +113,7 @@ regressor.summary()
 # In[38]:
 
 # Fitting the RNN to the Training set
-regressor.fit(X_train, y_train, epochs =10, batch_size = 32)
+regressor.fit(X_train, y_train, epochs = 1000, shuffle=False,verbose=1, batch_size = 16)
 
 
 # In[98]:
@@ -123,3 +123,4 @@ regressor.save('C:/Users/ar393556/Documents/Utilization-prediction-RNN-LSTM/mode
 
 
 
+print('model built successfully')
