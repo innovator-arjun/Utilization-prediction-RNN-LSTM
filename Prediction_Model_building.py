@@ -97,9 +97,9 @@ regressor = Sequential()
 
 model = Sequential()
 model.add(GRU(256 , input_shape = (X_train.shape[1], 1), return_sequences=True))
-model.add(Dropout(0.3))
+model.add(Dropout(0.4))
 model.add(LSTM(256))
-model.add(Dropout(0.3))
+model.add(Dropout(0.4))
 model.add(Dense(64 ,  activation = 'relu'))
 model.add(Dense(1))
 print(model.summary())
@@ -107,7 +107,7 @@ print(model.summary())
 model.compile(loss='mean_squared_error', optimizer=Adam(lr = 0.0005) , metrics = ['accuracy'])
 
 
-history = model.fit(X_train, y_train, epochs=750 , batch_size = 128 , 
+history = model.fit(X_train, y_train, epochs=2 , batch_size = 128 , 
           callbacks = [checkpoint , lr_reduce], shuffle=False,verbose=1 )
 
 
