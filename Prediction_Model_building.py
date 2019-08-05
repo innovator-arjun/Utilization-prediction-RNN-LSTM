@@ -28,13 +28,13 @@ application_name=['dns','https']
 # for i in application_name:
     
 df=preprocessed_df.loc[preprocessed_df['Application'] == 'dns']
-df=df[['Timestamp','Utilization(bps)']]
+df=df[['Timestamp','Utilization(kb)']]
 
 
 
 # In[30]:
 
-df=df[df['Utilization(bps)']!= 0]
+df=df[df['Utilization(kb)']!= 0]
 
 
 # In[31]:
@@ -62,8 +62,8 @@ training_set_scaled = sc.fit_transform(training_set_sliced)
 # Creating a data structure with 100 timesteps and 1 output
 X_train = []
 y_train = []
-for i in range(15, len(training_set)):
-    X_train.append(training_set_scaled[i-15:i, 0])
+for i in range(12, len(training_set)):
+    X_train.append(training_set_scaled[i-12:i, 0])
     y_train.append(training_set_scaled[i, 0])
 X_train, y_train = np.array(X_train), np.array(y_train)
 
@@ -75,10 +75,19 @@ X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 
 
 # Importing the Keras libraries and packages
+
+# Importing the Keras libraries and packages
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.layers import Dropout
+from keras.layers import Dense , BatchNormalization , Dropout , Activation
+from keras.layers import LSTM , GRU
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error
+from keras.optimizers import Adam , SGD , RMSprop
+
+filepath="stock_weights.hdf5"
+from keras.callbacks import ReduceLROnPlateau , ModelCheckpoint
+lr_reduce = ReduceLROnPlateau(monitor='val_loss', factor=0.1, epsilon=0.0001, patience=1, verbose=1)
+checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='max')
 
 # Initialising the RNN
 regressor = Sequential()
@@ -86,40 +95,28 @@ regressor = Sequential()
 
 # In[36]:
 
+model = Sequential()
+model.add(GRU(256 , input_shape = (X_train.shape[1], 1), return_sequences=True))
+model.add(Dropout(0.3))
+model.add(LSTM(256))
+model.add(Dropout(0.3))
+model.add(Dense(64 ,  activation = 'relu'))
+model.add(Dense(1))
+print(model.summary())
 
-# Adding the first LSTM layer and some Dropout regularisation
-# Adding the first LSTM layer and some Dropout regularisation
-regressor.add(LSTM(units = 100, activation = 'relu',return_sequences=True,input_shape = (X_train.shape[1], 1)))
-
-regressor.add(Dropout(0.1))
-regressor.add(LSTM(units = 50, activation = 'relu'))
-# Adding the output layer
-regressor.add(Dense(units = 1))
-#regressor.add(Activation("linear"))
-# Compiling the RNN
-#regressor.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics=['accuracy'])
-regressor.compile(loss="mse", optimizer="adam",metrics=['accuracy'])
+model.compile(loss='mean_squared_error', optimizer=Adam(lr = 0.0005) , metrics = ['accuracy'])
 
 
+history = model.fit(X_train, y_train, epochs=750 , batch_size = 128 , 
+          callbacks = [checkpoint , lr_reduce], shuffle=False,verbose=1 )
 
 
-
-
-# In[37]:
-
-regressor.summary()
-
-
-# In[38]:
-
-# Fitting the RNN to the Training set
-regressor.fit(X_train, y_train, epochs = 1000, shuffle=False,verbose=1, batch_size = 16)
 
 
 # In[98]:
 
 print('model built successfully')
-regressor.save('C:/Users/ar393556/Documents/Utilization-prediction-RNN-LSTM/model/task-scheduler.h5') 
+model.save('C:/Users/ar393556/Documents/Utilization-prediction-RNN-LSTM/model/new-dns-fine-tuning-task-scheduler.h5') 
 
 
 
