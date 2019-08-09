@@ -1,0 +1,19 @@
+During unplanned/outage/manintanance, the activity or data wont be captured
+2 servers we are monitioirng 09 & 10
+count and sum we need clarity
+column description would add value
+Data is missing for almost 3 months
+CPU, network, disk, memory information will add value ie activity on the corresponding time
+Business transaction TMSEfforts data is sparse we need more data for prediction
+maximum 1 year of data is maintained
+Server information should be captured for good prediction, all the nodes should be captured for correlation 
+We will start with one application
+Connect Arun for activity(cpu, memory, disk and  network) , so that information can be extracted
+Analtyics information , like how many user are using the application
+10 ms is marking as an error, we need the activity of the server  so that the root cause will be captured. It will be usefull to capture it is normal or abnormal activity
+Sidescope, we need some samples for analysis/correlation
+Linux, RHEL, ubuntu OS are used, we have to check the installation process to cpature the server activity
+Only one day data is shared, expecting data fro 1 year to get a good understanding
+
+
+
